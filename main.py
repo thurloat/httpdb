@@ -3,6 +3,13 @@ import simplejson
 import wsgiref.handlers
 from google.appengine.api import datastore
 from google.appengine.api import datastore_types
+from google.appengine.api import memcache
+
+from google.appengine.datastore import datastore_pb
+
+from google.appengine.api import apiproxy_stub_map
+
+DBNAME = 'Entity'
 
 class KeyValue(datastore.Entity):
     """
@@ -15,7 +22,7 @@ class KeyValue(datastore.Entity):
     feel free to destroy this, because it's a hacked mess.
     """
     def __init__(self,key,value=None):
-        datastore.Entity.__init__(self,'Entity',name=key)
+        datastore.Entity.__init__(self,DBNAME,name=key)
         self[key] = value
 
 class PathRoot:
@@ -49,12 +56,33 @@ class PathRoot:
         """
         if url_key is None:
             return "{}"
-        key = datastore_types.Key.from_path("Entity",url_key)
-        try:
-            e = datastore.Get(key)
-        except:
-            return "{}"
-        return simplejson.dumps(e)
+        else:
+            key = datastore_types.Key.from_path("Entity",url_key)
+            try:
+                """
+                    PERFORM ASYNC RPC call to datastore.
+                    check datastore._MakeSyncCall()
+                    check apiproxy_stub_map.UserRPC()
+                    
+                    rpc = userrpc
+                    rpc.make_call(blah)
+                    ...
+                    processing
+                    ...
+                    rpc.wait()
+                    rpc.check_success()
+                    
+                """
+                req = datastore_pb.GetRequest()
+                req.add_key(key)
+                rpc = datastore.CreateRPC()
+                rpc.make_call()
+                resp = 
+                e = datastore.Get(key)
+            except:
+                return "{}"
+            
+            return simplejson.dumps(e)
 
 def main():
     """
