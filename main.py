@@ -47,8 +47,9 @@ class PathRoot:
         params:
             @url_key: string to be converted to datastore key
         """
-        return "{}" if getValue is none
-        key = datastore_types.Key.from_path("Entity",getValue)
+        if url_key is None:
+            return "{}"
+        key = datastore_types.Key.from_path("Entity",url_key)
         try:
             e = datastore.Get(key)
         except:
