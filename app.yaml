@@ -1,5 +1,5 @@
-application: httpdb
-version: 1
+application: httpdbapp
+version: zero
 runtime: python
 api_version: 1
 
