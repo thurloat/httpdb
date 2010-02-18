@@ -5,6 +5,15 @@ from google.appengine.api import datastore
 from google.appengine.api import datastore_types
 
 class KeyValue(datastore.Entity):
+    """
+    Datastore entity that has it's unindexed properties be a variable, not sure the performance
+    implications of having an 'Entity' kind that could have ^n properties. 
+    
+    One advantage seems to assign both the keyname for the row, and the property name to the 
+    same value. This could make searching much easier.
+    
+    feel free to destroy this, because it's a hacked mess.
+    """
     def __init__(self,key,value=None):
         datastore.Entity.__init__(self,'Entity',name=key)
         self[key] = value
@@ -12,19 +21,33 @@ class KeyValue(datastore.Entity):
 class PathRoot:
     @cherrypy.expose
     def index(self):
+        """
+        function index, nothing to see here.
+        """
         return "This is the HTTPDB Server."
     @cherrypy.expose
-    def set(self, getValue=None, setValue=None):
+    def set(self, url_key=None, key_value=None):
+        """
+        function set, mapped to url: /set/$url_key/$key_value/
+        params:
+            @url_key: string to be saved in the datastore as the entity name
+            @key_value: string to be saved as the value to the above key
+        """
         try:
-            entity = KeyValue(getValue,setValue)
-            entity.value = setValue
+            entity = KeyValue(url_key,key_value)
             datastore.Put(entity)
         except:
             return "FAIL"
         return "SET"
 
     @cherrypy.expose
-    def get(self, getValue=None):
+    def get(self, url_key=None):
+        """
+        function get, mapped to url: /get/$url_key/
+        params:
+            @url_key: string to be converted to datastore key
+        """
+        return "{}" if getValue is none
         key = datastore_types.Key.from_path("Entity",getValue)
         try:
             e = datastore.Get(key)
