@@ -5,6 +5,8 @@ from google.appengine.api import datastore
 from google.appengine.api import datastore_types
 from google.appengine.api import memcache
 
+from google.net.proto import ProtocolBuffer
+
 from google.appengine.datastore import datastore_pb
 
 from google.appengine.api import apiproxy_stub_map
@@ -24,7 +26,11 @@ class KeyValue(datastore.Entity):
     def __init__(self,key,value=None):
         datastore.Entity.__init__(self,DBNAME,name=key)
         self[key] = value
-
+# class HTTPDBBuffResponse(ProtocolBuffer.ProtocolMessage):
+#     def __init__(self, contents=None):
+#         self.entity_ = []
+#         if content is not None: 
+        
 class PathRoot:
     @cherrypy.expose
     def index(self):
@@ -72,12 +78,17 @@ class PathRoot:
                     rpc.wait()
                     rpc.check_success()
                     
-                """
-                req = datastore_pb.GetRequest()
-                req.add_key(key)
-                rpc = datastore.CreateRPC()
-                rpc.make_call()
-                resp = 
+                # """
+                #                 req = datastore_pb.GetRequest()
+                #                 req.add_key(key)
+                #                 rpc = datastore.CreateRPC()
+                #                 rpc.make_call()
+                #                 resp = _MakeSyncCall(
+                #                        'datastore_v3', 'Get', req, datastore_pb.GetResponse(), rpc)
+                #                 
+                #                 
+                #                 
+                
                 e = datastore.Get(key)
             except:
                 return "{}"
