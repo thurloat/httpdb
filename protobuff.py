@@ -88,7 +88,6 @@ class HttpDbResponse(ProtocolBuffer.ProtocolMessage):
             if e1 != e2: return 0
         return 1
     def TryMerge(self,d):
-         print "trying merge"
          while d.avail() > 0:
            tt = d.getVarInt32()
            if tt == 11:
