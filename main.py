@@ -7,12 +7,12 @@ from google.appengine.api import datastore_types
 
 from google.appengine.api import memcache
 
-
+from google.appengine.datastore import datastore_pb
 from google.appengine.api import apiproxy_stub_map
 
 from cherrypy._cpdispatch import Dispatcher
 
-from protobuff import HttpDbJsonPropertyValue, HttpDbJsonProperty, HttpDbJsonEntityProto, HttpDbResponseEntity, HttpDbResponse, HttpDbRequest
+from protobuff import HttpDbJsonPropertyValue, HttpDbJsonProperty, HttpDbJsonEntityProto, HttpDbResponse_Entity, HttpDbResponse, HttpDbRequest
 
 DBNAME = 'Entity'
 
@@ -76,20 +76,22 @@ class PathRoot:
             return "{}"
         else:
             key = datastore_types.Key.from_path(DBNAME,url_key)
-            try:
-                req = HttpDbRequest()
-                req.key_list().append(key._ToPb())
-                rpc = apiproxy_stub_map.UserRPC('datastore_v3')
-                resp = HttpDbResponse()
-                rpc.make_call('Get',req,resp)
+           #try:
+            req = datastore_pb.GetRequest()
+            req.key_list().append(key._ToPb())
+            rpc = datastore.DatastoreRPC('datastore_v3')
+            resp = HttpDbResponse()
+            rpc.make_call('Get',req,resp)
             
-                import simplejson
-                rpc.check_success()
+            import simplejson
             
-                e = resp.entity_list()
-                return [simplejson.dumps(x.__json__()) for x in e]
-            except:
-                return "{}"
+            rpc.wait()
+            rpc.check_success()
+        
+            e = resp.entity_list()
+            return [simplejson.dumps(x.__json__()) for x in e]
+            #except:
+            #    return "{}"
     @cherrypy.expose
     def query(self, *args):
         return " | ".join(args)

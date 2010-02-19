@@ -39,12 +39,7 @@ class HttpDbJsonEntityProto(entity_pb.EntityProto):
         self.raw_property_.append(x)
         return x
 
-class HttpDbResponseEntity(ProtocolBuffer.ProtocolMessage):
-    has_entity_ = 0
-    entity_ = None
-    def __init__(self, contents=None):
-        self.lazy_init_lock_ = thread.allocate_lock()
-    def mutable_entity(self): self.has_entity_ = 1; return self.entity()
+class HttpDbResponse_Entity(datastore_pb.GetResponse_Entity):
     def entity(self):
         if self.entity_ is None:
             self.lazy_init_lock_.acquire()
@@ -53,17 +48,10 @@ class HttpDbResponseEntity(ProtocolBuffer.ProtocolMessage):
             finally:
                 self.lazy_init_lock_.release()
         return self.entity_
-    def OutputUnchecked(self, out):
-        if (self.has_entity_):
-            out.putVarInt32(18)
-            out.putVarInt32(self.entity_.ByteSize())
-            self.entity_.OutputUnchecked(out)
-    def __str__(self, prefix="", printElemNumber=0): return ""
     def __json__(self):
-        js = {}
-        fields = self.entity_.property_list()
-        for field in fields:
-            js[self.entity_.key().path().element(0).type()] = field.__json__()
+        js = []
+        for x in self.entity().property_list():
+            js.append(x.__json__())
         return js
 
 class HttpDbResponse(ProtocolBuffer.ProtocolMessage):
@@ -81,7 +69,7 @@ class HttpDbResponse(ProtocolBuffer.ProtocolMessage):
     def __str__(self,prefix="",printElemNumber=0):
         return self.buffstring
     def add_entity(self):
-        x = HttpDbResponseEntity()
+        x = HttpDbResponse_Entity()
         self.entity_.append(x)
         return x
     def mutable_entity(self, i):
@@ -91,6 +79,27 @@ class HttpDbResponse(ProtocolBuffer.ProtocolMessage):
             out.putVarInt32(11)
             self.entity_[i].OutputUnchecked(out)
             out.putVarInt32(12)
+    def __str__():
+        return "HttpDbResponse ..."
+    def Equals(self,other):
+        if x is self: return 1
+        if len(self.entity_) != len(x.entity_): return 0
+        for e1, e2 in zip(self.entity_,x.entity_):
+            if e1 != e2: return 0
+        return 1
+    def TryMerge(self,d):
+         print "trying merge"
+         while d.avail() > 0:
+           tt = d.getVarInt32()
+           if tt == 11:
+             self.add_entity().TryMerge(d)
+             continue
+           if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
+           d.skipData(tt)
+    def MergeFrom(self,d):
+         assert x is not self
+         for i in xrange(x.entity_size()): self.add_entity().CopyFrom(x.entity(i))
+    
 
 class HttpDbRequest(datastore_pb.GetRequest):
     def foo(self):
