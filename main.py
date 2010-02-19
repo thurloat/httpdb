@@ -9,7 +9,22 @@ from google.appengine.datastore import datastore_pb
 
 from google.appengine.api import apiproxy_stub_map
 
+from cherrypy._cpdispatch import Dispatcher
+
 DBNAME = 'Entity'
+
+class HttpDbDispatcher(object):
+    """
+    this is our custom dispatcher which strips out the database name (first
+    url part) and pass the rest of the url to the default dispatcher
+    
+    """
+    dispatcher = Dispatcher()
+    def __call__(self, path_info):
+        list = path_info.strip('/').split('/', 1)
+        DBNAME = list[0]
+        self.dispatcher(list[1])
+
 
 class KeyValue(datastore.Entity):
     """
@@ -26,6 +41,9 @@ class KeyValue(datastore.Entity):
         self[key] = value
 
 class PathRoot:
+    
+    
+    
     @cherrypy.expose
     def index(self):
         """
@@ -57,39 +75,48 @@ class PathRoot:
         if url_key is None:
             return "{}"
         else:
-            key = datastore_types.Key.from_path("Entity",url_key)
-            try:
-                """
-                    PERFORM ASYNC RPC call to datastore.
-                    check datastore._MakeSyncCall()
-                    check apiproxy_stub_map.UserRPC()
-                    
-                    rpc = userrpc
-                    rpc.make_call(blah)
-                    ...
-                    processing
-                    ...
-                    rpc.wait()
-                    rpc.check_success()
-                    
-                """
-                req = datastore_pb.GetRequest()
-                req.add_key(key)
-                rpc = datastore.CreateRPC()
-                rpc.make_call()
-                resp = 
-                e = datastore.Get(key)
-            except:
-                return "{}"
+            key = datastore_types.Key.from_path(DBNAME, url_key)
+#            try:
+            """
+                PERFORM ASYNC RPC call to datastore.
+                check datastore._MakeSyncCall()
+                check apiproxy_stub_map.UserRPC()
+                
+                rpc = userrpc
+                rpc.make_call(blah)
+                ...
+                processing
+                ...
+                rpc.wait()
+                rpc.check_success()
+                
+            """
+            req = datastore_pb.GetRequest()
+            req.add_key(key)
+            rpc = datastore.CreateRPC()
+            rpc.make_call()
+            #resp = 
+            e = datastore.Get(key)
+#            except:
+#                return "{}"
             
             return simplejson.dumps(e)
+        
+    @cherrypy.expose
+    def query(self, *args):
+        return " | ".join(args)
 
 def main():
     """
     Creating a cherrypy app using the PathRoot class as a root url handler.
     index, set & get are exposed to urls.
     """
-    wsgiref.handlers.CGIHandler().run(cherrypy.tree.mount(PathRoot(),"/"))
+    d = HttpDbDispatcher()
+    conf = {'/': 
+                {'request.dispatch': d} 
+           }
+    
+    wsgiref.handlers.CGIHandler().run(cherrypy.tree.mount(PathRoot(),"/", conf))
 
 if __name__ == '__main__':
-  main()
+    main()
