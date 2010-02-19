@@ -1,17 +1,18 @@
 import cherrypy
-import simplejson
 import wsgiref.handlers
+
+
 from google.appengine.api import datastore
 from google.appengine.api import datastore_types
+
 from google.appengine.api import memcache
 
-from google.net.proto import ProtocolBuffer
-
-from google.appengine.datastore import datastore_pb
 
 from google.appengine.api import apiproxy_stub_map
 
 from cherrypy._cpdispatch import Dispatcher
+
+from protobuff import HttpDbJsonPropertyValue, HttpDbJsonProperty, HttpDbJsonEntityProto, HttpDbResponseEntity, HttpDbResponse, HttpDbRequest
 
 DBNAME = 'Entity'
 
@@ -41,11 +42,7 @@ class KeyValue(datastore.Entity):
     def __init__(self,key,value=None):
         datastore.Entity.__init__(self,DBNAME,name=key)
         self[key] = value
-# class HTTPDBBuffResponse(ProtocolBuffer.ProtocolMessage):
-#     def __init__(self, contents=None):
-#         self.entity_ = []
-#         if content is not None: 
-        
+    
 class PathRoot:
     @cherrypy.expose
     def index(self):
@@ -78,38 +75,21 @@ class PathRoot:
         if url_key is None:
             return "{}"
         else:
-            key = datastore_types.Key.from_path("Entity",url_key)
+            key = datastore_types.Key.from_path(DBNAME,url_key)
             try:
-                """
-                    PERFORM ASYNC RPC call to datastore.
-                    check datastore._MakeSyncCall()
-                    check apiproxy_stub_map.UserRPC()
-                    
-                    rpc = userrpc
-                    rpc.make_call(blah)
-                    ...
-                    processing
-                    ...
-                    rpc.wait()
-                    rpc.check_success()
-                    
-                # """
-                #                 req = datastore_pb.GetRequest()
-                #                 req.add_key(key)
-                #                 rpc = datastore.CreateRPC()
-                #                 rpc.make_call()
-                #                 resp = _MakeSyncCall(
-                #                        'datastore_v3', 'Get', req, datastore_pb.GetResponse(), rpc)
-                #                 
-                #                 
-                #                 
-                
-                e = datastore.Get(key)
+                req = HttpDbRequest()
+                req.key_list().append(key._ToPb())
+                rpc = apiproxy_stub_map.UserRPC('datastore_v3')
+                resp = HttpDbResponse()
+                rpc.make_call('Get',req,resp)
+            
+                import simplejson
+                rpc.check_success()
+            
+                e = resp.entity_list()
+                return [simplejson.dumps(x.__json__()) for x in e]
             except:
                 return "{}"
-            
-            return simplejson.dumps(e)
-        
     @cherrypy.expose
     def query(self, *args):
         return " | ".join(args)
