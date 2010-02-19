@@ -87,8 +87,8 @@ class PathRoot:
             
             rpc.wait()
             rpc.check_success()
-        
             e = resp.entity_list()
+            
             return [simplejson.dumps(x.__json__()) for x in e]
             #except:
             #    return "{}"
