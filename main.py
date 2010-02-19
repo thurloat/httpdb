@@ -11,7 +11,22 @@ from google.appengine.datastore import datastore_pb
 
 from google.appengine.api import apiproxy_stub_map
 
+from cherrypy._cpdispatch import Dispatcher
+
 DBNAME = 'Entity'
+
+class HttpDbDispatcher(object):
+    """
+    this is our custom dispatcher which strips out the database name (first
+    url part) and pass the rest of the url to the default dispatcher
+    
+    """
+    dispatcher = Dispatcher()
+    def __call__(self, path_info):
+        list = path_info.strip('/').split('/', 1)
+        DBNAME = list[0]
+        self.dispatcher(list[1])
+
 
 class KeyValue(datastore.Entity):
     """
@@ -94,13 +109,22 @@ class PathRoot:
                 return "{}"
             
             return simplejson.dumps(e)
+        
+    @cherrypy.expose
+    def query(self, *args):
+        return " | ".join(args)
 
 def main():
     """
     Creating a cherrypy app using the PathRoot class as a root url handler.
     index, set & get are exposed to urls.
     """
-    wsgiref.handlers.CGIHandler().run(cherrypy.tree.mount(PathRoot(),"/"))
+    d = HttpDbDispatcher()
+    conf = {'/': 
+                {'request.dispatch': d} 
+           }
+    
+    wsgiref.handlers.CGIHandler().run(cherrypy.tree.mount(PathRoot(),"/", conf))
 
 if __name__ == '__main__':
-  main()
+    main()
