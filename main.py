@@ -25,6 +25,12 @@ class HttpDbDispatcher(object):
     dispatcher = Dispatcher()
     def __call__(self, path_info):
         list = path_info.strip('/').split('/', 1)
+        
+        #handle root url
+        if len(list) < 2:
+            self.dispatcher("/")
+            return       
+          
         DBNAME = list[0]
         self.dispatcher(list[1])
 
