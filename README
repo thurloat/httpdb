@@ -2,15 +2,18 @@ HTTPDB is a very simple and fast publically accessible key:value datastore that 
 
 The current incantation of the code is built on Google App Engine, however it disregards App Engine's built-in framework which uses webapp and a stripped down Django. 
 
-To keep this lean, It uses:
-- Cherrypy framework to map urls and handle general requests
-  - http://www.cherrypy.org/
+=====================
+External Dependencies
+=====================
 
-- simplejson to help convert the Protocol Buffer formatted db entities to pretty JSON strings
-  - http://pypi.python.org/pypi/simplejson/
+Cherrypy framework to map urls and handle general requests
+- http://www.cherrypy.org/
 
-- App Engine datastore api to store the data
-  - http://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/datastore.py
+simplejson to help convert the Protocol Buffer formatted db entities to pretty JSON strings
+- http://pypi.python.org/pypi/simplejson/
+
+App Engine Datastore api to store the data
+- http://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/datastore.py
 
 ===============
 Current Example
