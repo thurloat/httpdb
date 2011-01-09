@@ -1,8 +1,21 @@
 HTTPDB is a very simple and fast publically accessible key:value datastore that runs on App Engine. The idea is to give developers who have rich client applications the ability to store application information in the cloud with no setup. As a naming convention, the developer should strictly define data structures on the front end with keys such as "Class:Identifier:Property" which could map to something like "User:105:foo" which holds the value "bar".
 
-The current incantation of the code is built on Google App Engine, however it disregards App Engine's built-in framework which uses webapp and a stripped down Django. To keep this lean, It uses the cherrypy (http://www.cherrypy.org/) framework to map urls and handle general requests, simplejson (http://pypi.python.org/pypi/simplejson/) to help convert the Protocol Buffer formatted db entities to pretty JSON strings, and the raw appengine datastore api (http://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/datastore.py) to store our data.
+The current incantation of the code is built on Google App Engine, however it disregards App Engine's built-in framework which uses webapp and a stripped down Django. 
 
-Current Example:
+To keep this lean, It uses:
+- Cherrypy framework to map urls and handle general requests
+  - http://www.cherrypy.org/
+
+- simplejson to help convert the Protocol Buffer formatted db entities to pretty JSON strings
+  - http://pypi.python.org/pypi/simplejson/
+
+- App Engine datastore api to store the data
+  - http://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/datastore.py
+
+===============
+Current Example
+===============
+
 Request for Empty Data
 ~: curl http://httpdbapp.appspot.com/get/foo/
 {}
