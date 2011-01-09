@@ -1,10 +1,14 @@
-HTTPDB is a very simple and fast publically accessible key:value datastore that runs on App Engine. The idea is to give developers who have rich client applications the ability to store application information in the cloud with no setup. As a naming convention, the developer should strictly define data structures on the front end with keys such as "Class:Identifier:Property" which could map to something like "User:105:foo" which holds the value "bar".
+===================
+Project Description
+===================
 
-The current incantation of the code is built on Google App Engine, however it disregards App Engine's built-in framework which uses webapp and a stripped down Django. 
+HTTPDB is a very simple and fast publically accessible key:value datastore that runs on App Engine. The idea is to give developers who have rich client applications the ability to store application information in the cloud with no setup. As a naming convention, the developer should strictly define data structures on the front end with keys such as "Class:Identifier:Property" which could map to something like "User:105:foo" which holds the value "bar".
 
 =====================
 External Dependencies
 =====================
+
+The current incantation of the code is built on Google App Engine, however it disregards App Engine's built-in framework which uses webapp and a stripped down Django. 
 
 Cherrypy framework to map urls and handle general requests
 - http://www.cherrypy.org/
