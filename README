@@ -35,5 +35,26 @@ Re-Consume the Data:
 ~: curl http://httpdbapp.appspot.com/get/foo/
 {"foo": "bar"}
 
+===================
+Performance Results
+===================
+
+A lot of the discoveries in this project are performance based. Here's a list of real test performed on the appspot domain from a dedicated server, and what was done to achieve the result in the comments.
+
+Note: All tests were run 4 times, and the average was taken (not thorough, i know) ab -c 200 -n 2000
+
+App Engine Version      || Comments              || Req / Sec || Req mean time (ms)
+------------------------------------------------------------------------------------
+Java GAE: norexmedals   ||                       || 178       || 1068
+------------------------------------------------------------------------------------
+v. Cherrypy             || Using sync DS req. /w || 223       || 887
+                        || Datastore.get()       ||           ||
+------------------------------------------------------------------------------------
+v. Protobuff            || Async DS req.  using  || 297       || 682
+                        || protobuff.__json__()  ||           ||
+------------------------------------------------------------------------------------
+v. None                 || returns True in main()|| ~500      || ~450
+------------------------------------------------------------------------------------
+
 
 Started Using CherryPy wsgi framework. feature stripped, 10-20ms response.
