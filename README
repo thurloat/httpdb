@@ -41,20 +41,23 @@ Performance Results
 
 A lot of the discoveries in this project are performance based. Here's a list of real test performed on the appspot domain from a dedicated server, and what was done to achieve the result in the comments.
 
-Note: All tests were run 4 times, and the average was taken (not thorough, i know) ab -c 200 -n 2000
-
-App Engine Version      || Comments              || Req / Sec || Req mean time (ms)
+ App Engine Version      || Comments               || Req / Sec || Req mean time (ms)
 ------------------------------------------------------------------------------------
-Java GAE: norexmedals   ||                       || 178       || 1068
+ Java GAE: norexmedals   ||                        || 178       || 1068
 ------------------------------------------------------------------------------------
-v. Cherrypy             || Using sync DS req. /w || 223       || 887
-                        || Datastore.get()       ||           ||
+ v. Cherrypy             || Using sync DS req. /w  || 223       || 887
+                         || Datastore.get()        ||           ||
 ------------------------------------------------------------------------------------
-v. Protobuff            || Async DS req.  using  || 297       || 682
-                        || protobuff.__json__()  ||           ||
+ v. Protobuff            || Async DS req.  using   || 297       || 682
+                         || protobuff.__json__()   ||           ||
 ------------------------------------------------------------------------------------
-v. None                 || returns True in main()|| ~500      || ~450
+ v. None                 || returns True in main() || ~500      || ~450
 ------------------------------------------------------------------------------------
 
+Notes: 
+ - All tests were run 4 times, and the average was taken (not thorough, i know) ab -c 200 -n 2000
+ - the norexmedals project runs on Java App Engine and returns a heavily memcached JSON result.
+ - no caching was used for the Cherrypy or Protobuff versions.
+ - the same payload was generated and returned for all tests (minus the barebones True test)
 
 Started Using CherryPy wsgi framework. feature stripped, 10-20ms response.
